@@ -17,7 +17,7 @@ interface MusicMedia {
   genreId?: string;
   genre?: string;
 }
-export function getMusicMedias(): MusicMedia {
+export function getMusicMedias(): MusicMedia[] {
   return ExpoMediastoreModule.getMusicMediasSync();
 }
 
@@ -27,7 +27,7 @@ interface AlbumMedia {
   numberOfSongs: string;
   artist: string;
 }
-export function getAlbums(): AlbumMedia {
+export function getAlbums(): AlbumMedia[] {
   return ExpoMediastoreModule.readAlbumsSync();
 }
 
@@ -35,7 +35,7 @@ interface Genre {
   id: string;
   name: string;
 }
-export function getGenresSync(): Genre {
+export function getGenresSync(): Genre[] {
   return ExpoMediastoreModule.getGenresSync();
 }
 
@@ -45,6 +45,6 @@ interface GenreMember {
   artistId: string;
   albumId: string;
 }
-export function getGenreMediasSync(genreId: string): GenreMember {
+export function getGenreMediasSync(genreId: string): GenreMember[] {
   return ExpoMediastoreModule.getGenreMediasSync(genreId);
 }
