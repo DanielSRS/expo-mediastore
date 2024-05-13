@@ -25,3 +25,13 @@ interface MusicMedia {
 export function getMusicMedias(): MusicMedia {
   return ExpoMediastoreModule.getMusicMediasSync();
 }
+
+interface AlbumMedia {
+  id: string;
+  name: string;
+  numberOfSongs: string;
+  artist: string;
+}
+export function getAlbums(): AlbumMedia {
+  return ExpoMediastoreModule.readAlbumsSync();
+}

@@ -22,12 +22,23 @@ class MusicMedia : Record {
   @Field var albumArt: String = ""
 }
 
+class AlbumMedia : Record {
+  @Field var id: String = ""
+  @Field var name: String = ""
+  @Field var numberOfSongs: String = ""
+  @Field var artist: String = ""
+}
+
 class ExpoMediastoreModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ExpoMediastore")
 
     Function("getMusicMediasSync") {
       getMusicMediasSync()
+    }
+
+    Function("readAlbumsSync") {
+      readAlbumsSync()
     }
   }
 
@@ -96,6 +107,55 @@ class ExpoMediastoreModule : Module() {
           contentUri = "content://media" + externalContentUriProp.path + "/" + audioId
           albumId = albumID
           albumArt = "content://media/external/audio/albumart/$albumID"
+        }
+
+        files.add(item)
+      }
+    }
+
+    return files.toTypedArray()
+  }
+
+  private fun readAlbumsSync(): Array<AlbumMedia> {
+    val files = mutableListOf<AlbumMedia>()
+
+    val collectionProp = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    } else {
+      MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+    })
+
+    val idColumnProp = MediaStore.Audio.Albums._ID
+    val nameColumnProp = MediaStore.Audio.Albums.ALBUM
+    val numberOfSongsColumnProp = MediaStore.Audio.Albums.NUMBER_OF_SONGS
+    val artistColumnProp = MediaStore.Audio.Albums.ARTIST
+
+    val projection = arrayOf(
+            idColumnProp,
+            nameColumnProp,
+            numberOfSongsColumnProp,
+            artistColumnProp,
+    )
+    val query = appContext.reactContext?.contentResolver!!.query(
+            collectionProp,
+            projection,
+            null,
+            null,
+            null
+    )
+    query?.use { cursor ->
+      val idColumn = cursor.getColumnIndexOrThrow(idColumnProp)
+      val nameColumn = cursor.getColumnIndexOrThrow(nameColumnProp)
+      val numberOfSongsColumn = cursor.getColumnIndexOrThrow(numberOfSongsColumnProp)
+      val artistColumn = cursor.getColumnIndexOrThrow(artistColumnProp)
+
+      while (cursor.moveToNext()) {
+        val albumID = cursor.getLong(idColumn).toString()
+        val item = AlbumMedia().apply {
+          id = albumID
+          name = cursor.getString(nameColumn)
+          numberOfSongs = cursor.getString(numberOfSongsColumn)
+          artist = cursor.getString(artistColumn)
         }
 
         files.add(item)

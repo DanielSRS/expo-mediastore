@@ -42,6 +42,10 @@ export default function App() {
         const val = ExpoMediastore.getMusicMedias();
         console.debug('get object response: ',JSON.stringify(val,null, 2));
       }} />
+      <Button title={'get albums'} onPress={() => {
+        const val = ExpoMediastore.getAlbums();
+        console.debug('getAlbums response: ',JSON.stringify(val,null, 2));
+      }} />
       <Button title={'Get permission'} onPress={async () => {
         const hasPermission = await hasMusicPermission();
         if (!hasPermission) {
