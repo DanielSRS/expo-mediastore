@@ -22,6 +22,7 @@ interface MusicMedia {
   albumId: string;
   albumArt: string;
   genreId?: string;
+  genre?: string;
 }
 export function getMusicMedias(): MusicMedia {
   return ExpoMediastoreModule.getMusicMediasSync();
