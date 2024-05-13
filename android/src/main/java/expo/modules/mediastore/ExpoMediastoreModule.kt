@@ -20,6 +20,7 @@ class MusicMedia : Record {
   @Field var contentUri: String = ""
   @Field var albumId: String = ""
   @Field var albumArt: String = ""
+  @Field var genreId: String? = null
 }
 
 class AlbumMedia : Record {
@@ -81,6 +82,13 @@ class ExpoMediastoreModule : Module() {
     val artistColumnProp = MediaStore.Audio.Media.ARTIST
     val albumIdProp = MediaStore.Audio.Media.ALBUM_ID
 
+    val canRetrieveGenre = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+    val genreIdProp = (if (canRetrieveGenre) {
+      MediaStore.Audio.Media.GENRE_ID
+    } else {
+      ""
+    })
+
     val projection = arrayOf(
             idColumnProp,
             nameColumnProp,
@@ -90,7 +98,8 @@ class ExpoMediastoreModule : Module() {
             titleColumnProp,
             albumColumnProp,
             artistColumnProp,
-            albumIdProp
+            albumIdProp,
+            genreIdProp
     )
 
     val query = appContext.reactContext?.contentResolver!!.query(
@@ -110,6 +119,10 @@ class ExpoMediastoreModule : Module() {
       val albumColumn = cursor.getColumnIndexOrThrow(albumColumnProp)
       val artistColumn = cursor.getColumnIndexOrThrow(artistColumnProp)
       val albumIdColumn = cursor.getColumnIndexOrThrow(albumIdProp)
+      var genreIdColumn = 0
+      if (canRetrieveGenre) {
+        genreIdColumn = cursor.getColumnIndexOrThrow(genreIdProp)
+      }
 
       while (cursor.moveToNext()) {
         val audioId = cursor.getLong(idColumn)
@@ -126,6 +139,9 @@ class ExpoMediastoreModule : Module() {
           contentUri = "content://media" + externalContentUriProp.path + "/" + audioId
           albumId = albumID
           albumArt = "content://media/external/audio/albumart/$albumID"
+          if (canRetrieveGenre) {
+            genreId = cursor.getString(genreIdColumn)
+          }
         }
 
         files.add(item)
