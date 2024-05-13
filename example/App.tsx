@@ -50,6 +50,10 @@ export default function App() {
         const val = ExpoMediastore.getGenresSync();
         console.debug('getGenresSync response: ',JSON.stringify(val,null, 2));
       }} />
+      <Button title={'get genre (3996400854238603428) members'} onPress={() => {
+        const val = ExpoMediastore.getGenreMediasSync("3996400854238603428");
+        console.debug('getGenreMediasSync response: ',JSON.stringify(val,null, 2));
+      }} />
       <Button title={'Get permission'} onPress={async () => {
         const hasPermission = await hasMusicPermission();
         if (!hasPermission) {

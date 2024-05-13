@@ -43,3 +43,13 @@ interface Genre {
 export function getGenresSync(): Genre {
   return ExpoMediastoreModule.getGenresSync();
 }
+
+interface GenreMember {
+  id: string;
+  name: string;
+  artistId: string;
+  albumId: string;
+}
+export function getGenreMediasSync(genreId: string): GenreMember {
+  return ExpoMediastoreModule.getGenreMediasSync(genreId);
+}

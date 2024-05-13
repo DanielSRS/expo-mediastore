@@ -34,6 +34,12 @@ class Genre : Record {
   @Field var name: String = ""
 }
 
+class GenreMember : Record {
+  @Field var id: String = ""
+  @Field var name: String = ""
+  @Field var artistId: String = ""
+  @Field var albumId: String = ""
+}
 class ExpoMediastoreModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ExpoMediastore")
@@ -45,9 +51,13 @@ class ExpoMediastoreModule : Module() {
     Function("readAlbumsSync") {
       readAlbumsSync()
     }
-    
+
     Function("getGenresSync") {
       getGenresSync()
+    }
+
+    Function("getGenreMediasSync") { genreId: String ->
+      getGenreMediasSync(genreId)
     }
   }
 
@@ -206,6 +216,57 @@ class ExpoMediastoreModule : Module() {
         val item = Genre().apply {
           id = genreID
           name = cursor.getString(nameColumn)
+        }
+
+        files.add(item)
+      }
+    }
+
+    return files.toTypedArray()
+  }
+
+  private fun getGenreMediasSync(targetGenreId: String): Array<GenreMember> {
+    val files = mutableListOf<GenreMember>()
+    val genreId = targetGenreId.toLong()
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+      return files.toTypedArray()
+    }
+
+    val collectionProp = MediaStore.Audio.Genres.Members.getContentUri(MediaStore.VOLUME_EXTERNAL, genreId)
+    // val externalContentUriProp = ""
+    val audioIdProp = MediaStore.Audio.Genres.Members._ID
+    val audioNameProp = MediaStore.Audio.Genres.Members.TITLE
+    val artistProp = MediaStore.Audio.Genres.Members.ARTIST
+    val albumIdProp = MediaStore.Audio.Genres.Members.ALBUM_ID
+
+    val projection = arrayOf(
+            audioIdProp,
+            audioNameProp,
+            artistProp,
+            albumIdProp
+    )
+    val query = appContext.reactContext?.contentResolver!!.query(
+            collectionProp,
+            projection,
+            null,
+            null,
+            null
+    )
+
+    query?.use { cursor ->
+      val idColumn = cursor.getColumnIndexOrThrow(audioIdProp)
+      val nameColumn = cursor.getColumnIndexOrThrow(audioNameProp)
+      val artistColumn = cursor.getColumnIndexOrThrow(artistProp)
+      val albumIdColumn = cursor.getColumnIndexOrThrow(albumIdProp)
+
+      while (cursor.moveToNext()) {
+        val genreMemberID = cursor.getLong(idColumn).toString()
+        val item = GenreMember().apply {
+          id = genreMemberID
+          name = cursor.getString(nameColumn)
+          artistId = cursor.getString(artistColumn)
+          albumId = cursor.getString(albumIdColumn)
         }
 
         files.add(item)
