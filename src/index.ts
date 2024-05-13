@@ -48,3 +48,30 @@ interface GenreMember {
 export function getGenreMediasSync(genreId: string): GenreMember[] {
   return ExpoMediastoreModule.getGenreMediasSync(genreId);
 }
+
+interface FullMusicMedia {
+  id: number;
+  name: string;
+  duration: number;
+  size: number;
+  mime: string;
+  title: string;
+  album: string;
+  artist: string;
+  contentUri: string;
+  albumId: string;
+  albumArt: string;
+  genreId: string | null;
+  genre: string | null;
+  addedAt: number;
+  modifiedAt: number;
+  composer: string;
+  artistId: string;
+  cdTrackNumber: string;
+  isFavorite: number;
+  year: number;
+  path: string;
+}
+export function getFullMusicMediaByIdSync(musicId: string): FullMusicMedia |  null {
+  return ExpoMediastoreModule.getFullMusicMediaByIdSync(musicId);
+}
