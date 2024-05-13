@@ -35,3 +35,11 @@ interface AlbumMedia {
 export function getAlbums(): AlbumMedia {
   return ExpoMediastoreModule.readAlbumsSync();
 }
+
+interface Genre {
+  id: string;
+  name: string;
+}
+export function getGenresSync(): Genre {
+  return ExpoMediastoreModule.getGenresSync();
+}

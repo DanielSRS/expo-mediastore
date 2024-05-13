@@ -29,6 +29,11 @@ class AlbumMedia : Record {
   @Field var artist: String = ""
 }
 
+class Genre : Record {
+  @Field var id: String = ""
+  @Field var name: String = ""
+}
+
 class ExpoMediastoreModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("ExpoMediastore")
@@ -39,6 +44,10 @@ class ExpoMediastoreModule : Module() {
 
     Function("readAlbumsSync") {
       readAlbumsSync()
+    }
+    
+    Function("getGenresSync") {
+      getGenresSync()
     }
   }
 
@@ -156,6 +165,47 @@ class ExpoMediastoreModule : Module() {
           name = cursor.getString(nameColumn)
           numberOfSongs = cursor.getString(numberOfSongsColumn)
           artist = cursor.getString(artistColumn)
+        }
+
+        files.add(item)
+      }
+    }
+
+    return files.toTypedArray()
+  }
+
+  private fun getGenresSync(): Array<Genre> {
+    val collectionProp = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      MediaStore.Audio.Genres.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    } else {
+      MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI
+    })
+    val idColumnProp = MediaStore.Audio.Genres._ID
+    val nameColumnProp = MediaStore.Audio.Genres.NAME
+
+    val projection = arrayOf(
+            idColumnProp,
+            nameColumnProp,
+    )
+    val query = appContext.reactContext?.contentResolver!!.query(
+            collectionProp,
+            projection,
+            null,
+            null,
+            null
+    )
+
+    val files = mutableListOf<Genre>()
+
+    query?.use { cursor ->
+      val idColumn = cursor.getColumnIndexOrThrow(idColumnProp)
+      val nameColumn = cursor.getColumnIndexOrThrow(nameColumnProp)
+
+      while (cursor.moveToNext()) {
+        val genreID = cursor.getLong(idColumn).toString()
+        val item = Genre().apply {
+          id = genreID
+          name = cursor.getString(nameColumn)
         }
 
         files.add(item)
