@@ -86,12 +86,8 @@ class ExpoMediastoreModule : Module() {
     val canRetrieveGenre = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     var genreIdProp = ""
     var genreProp = ""
-    if (canRetrieveGenre) {
-      genreIdProp = MediaStore.Audio.Media.GENRE_ID
-      genreProp = MediaStore.Audio.Media.GENRE
-    }
 
-    val projection = arrayOf(
+    val projection = mutableListOf(
             idColumnProp,
             nameColumnProp,
             durationColumnProp,
@@ -101,13 +97,17 @@ class ExpoMediastoreModule : Module() {
             albumColumnProp,
             artistColumnProp,
             albumIdProp,
-            genreIdProp,
-            genreProp,
     )
+    if (canRetrieveGenre) {
+      genreIdProp = MediaStore.Audio.Media.GENRE_ID
+      genreProp = MediaStore.Audio.Media.GENRE
+      projection.add(genreIdProp)
+      projection.add(genreProp)
+    }
 
     val query = appContext.reactContext?.contentResolver!!.query(
             collectionProp,
-            projection,
+            projection.toTypedArray(),
             null,
             null,
             null
