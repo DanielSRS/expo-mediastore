@@ -8,3 +8,20 @@ export const PI = ExpoMediastoreModule.PI;
 export function hello(): string {
   return ExpoMediastoreModule.hello();
 }
+
+interface MusicMedia {
+  id: number;
+  name: string;
+  duration: number;
+  size: number;
+  mime: string;
+  title: string;
+  album: string;
+  artist: string;
+  contentUri: string;
+  albumId: string;
+  albumArt: string;
+}
+export function getMusicMedias(): MusicMedia {
+  return ExpoMediastoreModule.getMusicMediasSync();
+}
